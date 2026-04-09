@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+/* Base styles for the medical app */
+@layer base {
+  body {
+    @apply antialiased text-gray-800 bg-slate-50;
+  }
+}
