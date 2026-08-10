@@ -1,81 +1,132 @@
-import { useState } from 'react';
-import { Calendar as CalendarIcon, Clock, User, FileText, CheckCircle2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Calendar as CalendarIcon, Clock, User, FileText, CheckCircle2, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function BookAppointment() {
   const [step, setStep] = useState(1);
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  
   const [formData, setFormData] = useState({
-    doctor: '',
+    doctorId: '',
+    doctorName: '',
     date: '',
     time: '',
     reason: ''
   });
 
-  const doctors = [
-    { id: '1', name: 'Dr. Sarah Tripathi', specialty: 'General Practitioner', available: true },
-    { id: '2', name: 'Dr. Mark Davis', specialty: 'Cardiologist', available: true },
-    { id: '3', name: 'Dr. Amir Khan', specialty: 'Dermatologist', available: true },
-    { id: '4', name: 'Dr. K.K. Agrawal', specialty: 'Pediatrician', available: false }
-  ];
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const res = await fetch('/api/doctors');
+        if (res.ok) {
+          const data = await res.json();
+          setDoctors(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch doctors:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDoctors();
+  }, []);
 
   const timeSlots = [
     '09:00 AM', '09:30 AM', '10:00 AM', '11:00 AM', '01:30 PM', '02:00 PM', '03:30 PM', '04:00 PM'
   ];
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setStep(3); 
+    setSubmitting(true);
+    
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('/api/appointments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token
+        },
+        body: JSON.stringify({
+          doctorId: formData.doctorId,
+          doctorName: formData.doctorName,
+          date: formData.date,
+          time: formData.time,
+          reason: formData.reason
+        })
+      });
+
+      if (res.ok) {
+        setStep(3); 
+      } else {
+        const errorData = await res.json();
+        alert(errorData.msg || "Failed to book appointment. Please try again.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong joining server.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <div className="p-4 md:p-8 max-w-4xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Book an Appointment</h1>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Book an Appointment</h1>
         <p className="text-gray-500 mt-1">Schedule a visit with one of our specialists</p>
       </div>
 
       {step === 1 && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 md:p-8">
           <h2 className="text-xl font-semibold mb-6">Step 1: Select a Doctor</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {doctors.map(doc => (
-              <button
-                key={doc.id}
-                onClick={() => {
-                  setFormData({...formData, doctor: doc.name});
-                  setStep(2);
-                }}
-                disabled={!doc.available}
-                className={`flex items-start gap-4 p-4 rounded-xl border text-left transition-all ${
-                  doc.available 
-                    ? 'border-gray-200 hover:border-teal-500 hover:bg-teal-50 hover:shadow-sm cursor-pointer' 
-                    : 'border-gray-100 bg-gray-50 opacity-60 cursor-not-allowed'
-                }`}
-              >
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${doc.available ? 'bg-teal-100 text-teal-600' : 'bg-gray-200 text-gray-500'}`}>
-                  <User className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900">{doc.name}</h3>
-                  <p className="text-sm text-gray-500">{doc.specialty}</p>
-                  {!doc.available && <span className="text-xs text-rose-500 font-medium mt-1 block">Currently Unavailable</span>}
-                </div>
-              </button>
-            ))}
-          </div>
+          
+          {loading ? (
+             <div className="flex justify-center p-8 text-indigo-600"><Loader2 className="w-8 h-8 animate-spin" /></div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {doctors.map(doc => (
+                <button
+                  key={doc._id}
+                  onClick={() => {
+                    setFormData({...formData, doctorId: doc._id, doctorName: doc.name});
+                    setStep(2);
+                  }}
+                  disabled={!doc.available}
+                  className={`flex items-start gap-4 p-4 rounded-xl border text-left transition-all ${
+                    doc.available 
+                      ? 'border-gray-200 dark:border-gray-700 hover:border-indigo-500 hover:bg-indigo-50 hover:shadow-sm cursor-pointer' 
+                      : 'border-gray-100 dark:border-gray-700 bg-gray-50 opacity-60 cursor-not-allowed'
+                  }`}
+                >
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${doc.available ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-200 text-gray-500'}`}>
+                    <User className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 dark:text-gray-100">{doc.name}</h3>
+                    <p className="text-sm text-gray-500">{doc.specialty}</p>
+                    {doc.experience && <p className="text-xs text-gray-400">{doc.experience}</p>}
+                    {!doc.available && <span className="text-xs text-rose-500 font-medium mt-1 block">Currently Unavailable</span>}
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
       {step === 2 && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 md:p-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold">Step 2: Choose Date & Time</h2>
-            <button onClick={() => setStep(1)} className="text-sm text-teal-600 font-medium hover:underline">Change Doctor</button>
+            <button onClick={() => setStep(1)} className="text-sm text-indigo-600 font-medium hover:underline">Change Doctor</button>
           </div>
           
-          <div className="mb-6 p-4 bg-teal-50 rounded-xl flex items-center gap-3">
-             <User className="w-5 h-5 text-teal-600" />
-             <span className="font-medium text-teal-900">Booking with {formData.doctor}</span>
+          <div className="mb-6 p-4 bg-indigo-50 rounded-xl flex items-center gap-3">
+             <User className="w-5 h-5 text-indigo-600" />
+             <span className="font-medium text-indigo-900">Booking with {formData.doctorName}</span>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -89,7 +140,7 @@ export default function BookAppointment() {
                   <input 
                     type="date" 
                     required
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-teal-500 focus:border-teal-500 transition-colors bg-white"
+                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 transition-colors bg-white dark:bg-gray-800"
                     value={formData.date}
                     onChange={(e) => setFormData({...formData, date: e.target.value})}
                   />
@@ -104,7 +155,7 @@ export default function BookAppointment() {
                   </div>
                   <select 
                     required
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-teal-500 focus:border-teal-500 transition-colors bg-white appearance-none"
+                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 transition-colors bg-white dark:bg-gray-800 appearance-none"
                     value={formData.time}
                     onChange={(e) => setFormData({...formData, time: e.target.value})}
                   >
@@ -126,7 +177,7 @@ export default function BookAppointment() {
                 <textarea 
                   required
                   rows="3"
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-teal-500 focus:border-teal-500 transition-colors resize-none"
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 transition-colors resize-none"
                   placeholder="Briefly describe your symptoms or reason for the appointment..."
                   value={formData.reason}
                   onChange={(e) => setFormData({...formData, reason: e.target.value})}
@@ -134,7 +185,7 @@ export default function BookAppointment() {
               </div>
             </div>
 
-            <div className="flex gap-4 pt-4 border-t border-gray-100">
+            <div className="flex gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">
               <button 
                 type="button" 
                 onClick={() => setStep(1)}
@@ -144,9 +195,10 @@ export default function BookAppointment() {
               </button>
               <button 
                 type="submit" 
-                className="flex-1 bg-teal-600 text-white rounded-xl font-bold py-3 hover:bg-teal-700 transition-colors shadow-sm"
+                disabled={submitting}
+                className={`flex-1 ${submitting ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'} text-white rounded-xl font-bold py-3 transition-colors shadow-sm flex items-center justify-center gap-2`}
               >
-                Confirm Appointment
+                {submitting ? <><Loader2 className="w-5 h-5 animate-spin" /> Details saving...</> : 'Confirm Appointment'}
               </button>
             </div>
           </form>
@@ -154,19 +206,19 @@ export default function BookAppointment() {
       )}
 
       {step === 3 && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center max-w-lg mx-auto">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 text-center max-w-lg mx-auto">
           <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle2 className="w-10 h-10" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Appointment Confirmed!</h2>
+          <h2 className="text-[#0f172a] dark:text-gray-100xl font-bold text-gray-900 dark:text-gray-100 mb-2">Appointment Confirmed!</h2>
           <p className="text-gray-600 mb-6">
-            Your appointment with <span className="font-semibold text-gray-900">{formData.doctor}</span> has been successfully scheduled for <span className="font-semibold text-gray-900">{formData.date}</span> at <span className="font-semibold text-gray-900">{formData.time}</span>.
+            Your appointment with <span className="font-semibold text-gray-900 dark:text-gray-100">{formData.doctorName}</span> has been successfully scheduled for <span className="font-semibold text-gray-900 dark:text-gray-100">{formData.date}</span> at <span className="font-semibold text-gray-900 dark:text-gray-100">{formData.time}</span>.
           </p>
           <div className="flex flex-col gap-3">
-            <Link to="/" className="w-full bg-teal-600 text-white rounded-xl font-bold py-3 hover:bg-teal-700 transition-colors shadow-sm inline-block">
+            <Link to="/" className="w-full bg-indigo-600 text-white rounded-xl font-bold py-3 hover:bg-indigo-700 transition-colors shadow-sm inline-block">
               Return to Dashboard
             </Link>
-            <button className="w-full bg-white border border-gray-200 text-gray-700 rounded-xl font-medium py-3 hover:bg-gray-50 transition-colors inline-block">
+            <button className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 rounded-xl font-medium py-3 hover:bg-gray-50 transition-colors inline-block">
               Add to Calendar
             </button>
           </div>

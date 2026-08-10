@@ -50,7 +50,15 @@ export default function HealthChat() {
         body: JSON.stringify({
           contents: [{
              parts: [{
-                text: `You are a helpful, professional AI medical assistant for the PreHealth Diagnostic System. A user is describing their symptoms: "${text}". Please provide a short assessment, advice on whether they should perform self-care or seek medical attention, and be empathetic but maintain a clinical tone. End your response with a clear severity level from: [LOW_URGENCY, MEDIUM_URGENCY, HIGH_URGENCY].` 
+                text: `You are a helpful, professional AI medical assistant for the PreHealth Diagnostic System.
+                If the user describes symptoms: provide a short assessment, advice on urgency, and basic care steps.
+                If the user asks about a disease: explain it simply, common causes, and when to see a doctor.
+                User input: "${text}"
+                
+                Guidelines:
+                1. Be empathetic but professional.
+                2. Do not give a final medical diagnosis.
+                3. End your response with exactly one of these tags: [LOW_URGENCY], [MEDIUM_URGENCY], [HIGH_URGENCY].` 
              }]
           }]
         })
@@ -59,7 +67,8 @@ export default function HealthChat() {
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error("Failed to fetch response");
+        console.error("Gemini API Error Data:", data);
+        throw new Error(data.error?.message || "Failed to fetch response");
       }
 
       const generatedText = data.candidates[0].content.parts[0].text;
@@ -132,21 +141,21 @@ export default function HealthChat() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-50 relative">
-      <div className="bg-white px-6 py-4 border-b border-gray-200 flex items-center justify-between sticky top-0 z-10 shadow-sm">
+    <div className="flex flex-col h-full bg-slate-50 dark:bg-gray-900 relative">
+      <div className="bg-white dark:bg-gray-800 px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between sticky top-0 z-10 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-teal-100 text-teal-600 rounded-xl flex items-center justify-center">
+          <div className="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center">
             <ShieldPlus className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="font-bold text-gray-900 text-lg leading-tight">AI Symptom Checker</h1>
+            <h1 className="font-bold text-gray-900 dark:text-gray-100 text-lg leading-tight">AI Symptom Checker</h1>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-green-500"></span>
               <span className="text-xs text-gray-500 font-medium">Online Model: Active</span>
             </div>
           </div>
         </div>
-        <button className="text-gray-400 hover:text-teal-600 transition-colors">
+        <button className="text-gray-400 hover:text-indigo-600 transition-colors">
           <Info className="w-5 h-5" />
         </button>
       </div>
@@ -158,10 +167,10 @@ export default function HealthChat() {
         ))}
         {isTyping && (
           <div className="flex justify-start mb-4">
-            <div className="bg-white border border-gray-100 shadow-sm rounded-2xl rounded-bl-sm p-4 w-20 flex justify-center gap-1">
-               <span className="w-2 h-2 bg-teal-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-               <span className="w-2 h-2 bg-teal-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-               <span className="w-2 h-2 bg-teal-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+            <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm rounded-2xl rounded-bl-sm p-4 w-20 flex justify-center gap-1">
+               <span className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+               <span className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+               <span className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
             </div>
           </div>
         )}

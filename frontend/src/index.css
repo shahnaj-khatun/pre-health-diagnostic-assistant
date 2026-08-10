@@ -1,8 +1,55 @@
 @import "tailwindcss";
+@custom-variant dark (&:is(.dark *));
 
 /* Base styles for the medical app */
 @layer base {
   body {
-    @apply antialiased text-gray-800 bg-slate-50;
+    @apply antialiased text-gray-800 bg-slate-50 dark:bg-gray-900 dark:text-gray-100;
   }
+}
+
+/* Premium Utilities */
+@layer utilities {
+  .glass {
+    @apply bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border border-white/20 dark:border-gray-800/50 shadow-xl;
+  }
+  .glass-card {
+    @apply bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-100 dark:border-gray-700 shadow-sm transition-all duration-300;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  /* 3D Hover Effect */
+  .hover-3d {
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.4);
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+  .hover-3d:hover {
+    transform: rotateX(6deg) rotateY(-6deg) translateZ(30px) scale(1.03);
+    box-shadow: 20px 30px 50px -15px rgba(79, 70, 229, 0.3), inset 0px 1px 2px rgba(255, 255, 255, 0.5);
+    border-color: rgba(99, 102, 241, 0.6);
+  }
+  
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+}
+
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
 }

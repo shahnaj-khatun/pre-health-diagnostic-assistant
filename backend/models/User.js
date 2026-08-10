@@ -27,8 +27,18 @@ const userSchema = new mongoose.Schema({
         age: Number,
         gender: String,
         bloodGroup: String,
+        phone: String,
+        dob: String,
+        height: Number,
+        weight: Number,
+        bmi: Number,
         medicalHistory: [String]
     },
+    prescriptions: [{
+        filename: String,
+        url: String,
+        date: { type: Date, default: Date.now }
+    }],
     createdAt: {
         type: Date,
         default: Date.now

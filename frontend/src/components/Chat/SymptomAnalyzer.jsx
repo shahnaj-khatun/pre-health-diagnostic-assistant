@@ -17,14 +17,14 @@ export default function SymptomAnalyzer({ onSendMessage }) {
   ];
 
   return (
-    <div className="bg-white border-t border-gray-200 p-4">
+    <div className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4">
       {/* Quick Select Symptoms */}
       <div className="flex gap-2 overflow-x-auto pb-3 mb-1 no-scrollbar">
         {quickSymptoms.map(symptom => (
           <button
             key={symptom}
             onClick={() => onSendMessage(`I'm experiencing a ${symptom.toLowerCase()}.`)}
-            className="flex-shrink-0 px-4 py-1.5 bg-gray-100 hover:bg-teal-50 text-gray-700 hover:text-teal-700 text-sm font-medium rounded-full transition-colors whitespace-nowrap border border-transparent hover:border-teal-200"
+            className="flex-shrink-0 px-4 py-1.5 bg-gray-100 hover:bg-indigo-50 text-gray-700 hover:text-indigo-700 text-sm font-medium rounded-full transition-colors whitespace-nowrap border border-transparent hover:border-indigo-200"
           >
             + {symptom}
           </button>
@@ -34,7 +34,7 @@ export default function SymptomAnalyzer({ onSendMessage }) {
       <form onSubmit={handleSubmit} className="flex items-end gap-2 max-w-4xl mx-auto">
         <button 
           type="button" 
-          className="p-3 text-gray-400 hover:text-teal-600 hover:bg-teal-50 rounded-full transition-colors flex-shrink-0"
+          className="p-3 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors flex-shrink-0"
         >
           <Paperclip className="w-5 h-5" />
         </button>
@@ -44,7 +44,7 @@ export default function SymptomAnalyzer({ onSendMessage }) {
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             placeholder="Describe your symptoms in detail..."
-            className="w-full bg-slate-50 border border-gray-200 text-gray-800 rounded-2xl pl-4 pr-12 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent resize-none overflow-hidden min-h-[50px] max-h-[150px]"
+            className="w-full bg-slate-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 rounded-2xl pl-4 pr-12 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none overflow-hidden min-h-[50px] max-h-[150px]"
             rows="1"
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
@@ -57,11 +57,11 @@ export default function SymptomAnalyzer({ onSendMessage }) {
         
         <button 
           type="submit" 
-          disabled={!inputText.trim()}
+          onClick={handleSubmit}
           className={`p-3 rounded-full flex-shrink-0 transition-colors ${
             inputText.trim() 
-              ? 'bg-teal-600 text-white hover:bg-teal-700 shadow-md' 
-              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+              ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md' 
+              : 'bg-gray-200 text-gray-400 hover:bg-gray-300'
           }`}
         >
           <Send className="w-5 h-5 ml-0.5" />

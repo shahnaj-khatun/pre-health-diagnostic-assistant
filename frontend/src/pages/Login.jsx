@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Heart, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { HeartPulse, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { motion } from 'framer-motion';
+import TiltCard from '../components/TiltCard';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -29,81 +31,146 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center py-10 bg-[#f8fbff] px-4 font-sans">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-[#0f172a] mb-2">HealthAI Diagnostic System</h1>
-        <p className="text-[#64748b]">Your personal AI-powered health assistant for symptom analysis and treatment guidance</p>
-      </div>
-
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden p-8 border border-gray-100">
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mb-4">
-            <Heart className="w-8 h-8" />
-          </div>
-          <h2 className="text-2xl font-bold text-[#0f172a] mb-1">Welcome Back</h2>
-          <p className="text-[#64748b] text-sm">Sign in to your health account</p>
+    <div className="flex min-h-screen bg-slate-50 dark:bg-gray-900 font-sans">
+      
+      {/* Left Side - Visual / Brand Showcase */}
+      <div className="hidden lg:flex flex-col w-1/2 bg-gradient-to-br from-indigo-900 via-indigo-800 to-violet-900 text-white relative overflow-hidden">
+        {/* Abstract Background Shapes */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
+           <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-500 rounded-full mix-blend-multiply filter blur-[100px] opacity-60 animate-blob"></div>
+           <div className="absolute top-[20%] right-[-10%] w-[400px] h-[400px] bg-violet-400 rounded-full mix-blend-multiply filter blur-[100px] opacity-60 animate-blob animation-delay-2000"></div>
+           <div className="absolute bottom-[-10%] left-[20%] w-[600px] h-[600px] bg-fuchsia-500 rounded-full mix-blend-multiply filter blur-[120px] opacity-40 animate-blob animation-delay-4000"></div>
         </div>
         
-        <form onSubmit={handleLogin} className="space-y-5">
-          <div>
-            <label className="block text-sm font-medium text-[#0f172a] mb-1.5">Email Address</label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                <Mail className="h-4 w-4 text-gray-400" />
-              </div>
-              <input 
-                type="email" 
-                className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
+        {/* Content */}
+        <div className="relative z-10 flex flex-col justify-between h-full p-16">
+          <div className="flex items-center gap-3">
+             <HeartPulse className="w-10 h-10 text-violet-300" />
+             <span className="text-2xl font-bold tracking-tight">PreHealth AI</span>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-[#0f172a] mb-1.5">Password</label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                <Lock className="h-4 w-4 text-gray-400" />
-              </div>
-              <input 
-                type={showPassword ? "text" : "password"}
-                className="block w-full pl-10 pr-10 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <button 
-                type="button" 
-                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
-            </div>
+          <div className="max-w-md">
+             <motion.h1 
+               initial={{ opacity: 0, y: 20 }}
+               animate={{ opacity: 1, y: 0 }}
+               transition={{ delay: 0.2 }}
+               className="text-5xl font-extrabold mb-6 leading-tight"
+             >
+               Welcome back to better health.
+             </motion.h1>
+             <motion.p 
+               initial={{ opacity: 0, y: 20 }}
+               animate={{ opacity: 1, y: 0 }}
+               transition={{ delay: 0.4 }}
+               className="text-indigo-200 text-lg leading-relaxed"
+             >
+               Access your personalized medical profile, analyze symptoms instantly, and manage your treatments securely in one place.
+             </motion.p>
           </div>
 
-          {error && (
-            <div className="mb-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
-              {error}
-            </div>
-          )}
-          <button 
-            type="submit" 
-            disabled={loading}
-            className="w-full flex justify-center items-center py-2.5 px-4 rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors mt-2"
-          >
-            {loading ? 'Signing in...' : 'Sign In'}
-          </button>
-        </form>
-
-        <div className="mt-8 text-center text-sm">
-          <span className="text-[#64748b]">Don't have an account? </span>
-          <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">Create Account</Link>
+          <div className="flex items-center gap-4 text-sm text-indigo-300 font-medium">
+             <span>Secure.</span>
+             <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full"></span>
+             <span>Intelligent.</span>
+             <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full"></span>
+             <span>Private.</span>
+          </div>
         </div>
+      </div>
+
+      {/* Right Side - Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 md:p-24 relative perspective-1000">
+        <TiltCard className="w-full max-w-md">
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="w-full bg-white dark:bg-gray-800 rounded-3xl p-8 sm:p-10 shadow-2xl border border-gray-100 dark:border-gray-700"
+          >
+          <div className="lg:hidden flex items-center gap-3 mb-10 justify-center">
+             <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center">
+               <HeartPulse className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+             </div>
+             <span className="text-2xl font-bold text-gray-900 dark:text-white">PreHealth</span>
+          </div>
+
+          <div className="mb-10 text-center lg:text-left">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Sign in</h2>
+            <p className="text-gray-500 dark:text-gray-400">Enter your details to access your account</p>
+          </div>
+          
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-indigo-600 text-gray-400">
+                  <Mail className="h-5 w-5" />
+                </div>
+                <input 
+                  type="email" 
+                  className="block w-full pl-11 pr-4 py-3.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-gray-900 dark:text-white"
+                  placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <div className="mb-2">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Password</label>
+              </div>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-indigo-600 text-gray-400">
+                  <Lock className="h-5 w-5" />
+                </div>
+                <input 
+                  type={showPassword ? "text" : "password"}
+                  className="block w-full pl-11 pr-12 py-3.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-gray-900 dark:text-white"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <button 
+                  type="button" 
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
+            </div>
+
+            {error && (
+              <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="p-3 bg-rose-50 dark:bg-rose-900/30 border border-rose-200 dark:border-rose-800 rounded-xl text-rose-600 dark:text-rose-400 text-sm font-medium flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-rose-500"></div> {error}
+              </motion.div>
+            )}
+
+            <button 
+              type="submit" 
+              disabled={loading}
+              className="group relative w-full flex justify-center items-center py-4 px-4 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all overflow-hidden shadow-lg shadow-indigo-500/30 active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100"
+            >
+              <span className="relative z-10 flex items-center gap-2">
+                 {loading ? 'Signing in...' : 'Sign In'}
+                 {!loading && <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
+              </span>
+              {/* Subtle hover sweep effect */}
+              <div className="absolute inset-0 h-full w-0 bg-white/20 transition-all duration-300 ease-out group-hover:w-full z-0 opacity-0 group-hover:opacity-100"></div>
+            </button>
+          </form>
+
+          <div className="mt-10 text-center text-sm">
+            <span className="text-gray-500 dark:text-gray-400">Don't have an account? </span>
+            <Link to="/register" className="font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 transition-colors">
+              Create Account
+            </Link>
+          </div>
+        </motion.div>
+        </TiltCard>
       </div>
     </div>
   );
