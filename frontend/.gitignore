@@ -31,4 +31,3 @@ frontend/node_modules/
 .env
 backend/.env
 frontend/.envS
-.vscode/
